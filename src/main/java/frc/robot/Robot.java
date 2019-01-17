@@ -7,7 +7,11 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+//import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+/*
+ * If there is an error on this line (com.ctre is highlighted in red) it means that you have not added the Cross The Road Electronics libraries
+ * to your build environment. Add them using the steps outlined in https://phoenix-documentation.readthedocs.io/en/latest/ch05a_CppJava.html
+ */
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
@@ -56,23 +60,24 @@ public class Robot extends TimedRobot {
      * These two lines are for one or move PWM style drive controllers.
      * Uncomment the lines and add (or remove) Spark definitions as necessary
      */
-    //leftController = new SpeedControllerGroup(new Spark(RobotMap.DRIVE_LEFT1_PWM_ID), new Spark(RobotMap.DRIVE_LEFT2_PWM_ID));
-    //rightController = new SpeedControllerGroup(new Spark(RobotMap.DRIVE_RIGHT1_PWM_ID), new Spark(RobotMap.DRIVE_RIGHT2_PWM_ID));
+    leftController = new SpeedControllerGroup(new Spark(RobotMap.DRIVE_LEFT1_PWM_ID), new Spark(RobotMap.DRIVE_LEFT2_PWM_ID));
+    rightController = new SpeedControllerGroup(new Spark(RobotMap.DRIVE_RIGHT1_PWM_ID), new Spark(RobotMap.DRIVE_RIGHT2_PWM_ID));
 
     /*
      * These two lines are for CTRE Talon SRX CAN Bus style drive controllers.
      * Uncomment the lines and add (or remove) WPI_TalonSRX definitions as necessary
+     * Note: you will also need to add the CTRE phoenix libraries (see above)
      */
-    leftController = new SpeedControllerGroup(new WPI_TalonSRX(RobotMap.DRIVE_LEFT1_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_LEFT2_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_LEFT3_CAN_ID));
-    rightController = new SpeedControllerGroup(new WPI_TalonSRX(RobotMap.DRIVE_RIGHT1_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_RIGHT2_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_RIGHT3_CAN_ID));
+    //leftController = new SpeedControllerGroup(new WPI_TalonSRX(RobotMap.DRIVE_LEFT1_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_LEFT2_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_LEFT3_CAN_ID));
+    //rightController = new SpeedControllerGroup(new WPI_TalonSRX(RobotMap.DRIVE_RIGHT1_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_RIGHT2_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_RIGHT3_CAN_ID));
 
     drive = new DifferentialDrive(leftController, rightController);
     /*
      * These drive subsystem definitions are defining how the driver's controlls affect the motor.
      * You need ONE of these uncommented, so depending on which style you want chose the appropriate line.
      */
-    //driveSubsystem = new DriveSubsystem(driverInput::getY, driverInput::getTwist, drive, RobotMap.DriveStyle.DRIVE_STYLE_ARCADE);   // single flight stick with twist for turning
-    driveSubsystem = new DriveSubsystem(() -> driverInput.getRawAxis(1), () -> driverInput.getRawAxis(5), drive, RobotMap.DriveStyle.DRIVE_STYLE_TANK); // single gamepad using thumb sticks as tank control
+    driveSubsystem = new DriveSubsystem(driverInput::getY, driverInput::getTwist, drive, RobotMap.DriveStyle.DRIVE_STYLE_ARCADE);   // single flight stick with twist for turning
+    //driveSubsystem = new DriveSubsystem(() -> driverInput.getRawAxis(1), () -> driverInput.getRawAxis(5), drive, RobotMap.DriveStyle.DRIVE_STYLE_TANK); // single gamepad using thumb sticks as tank control
 
     /*
       *  create a widget subsystem. This is code that controls some widget. In the example code it is just a simple motor.
