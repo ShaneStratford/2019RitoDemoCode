@@ -7,6 +7,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import frc.robot.LIbrary.DemoTrigger;
+import frc.robot.LIbrary.GamepadButtons;
+import frc.robot.commands.WidgetMoveDownCommand;
+import frc.robot.commands.WidgetMoveUpCommand;
+import frc.robot.commands.WidgetStopCommand;
+import frc.robot.subsystems.WidgetSubsystem;
+
 /**
  * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
@@ -39,4 +48,27 @@ public class OI {
   // Start the command when the button is released and let it run the command
   // until it is finished as determined by it's isFinished method.
   // button.whenReleased(new ExampleCommand());
+  public OI(
+			Joystick driverGamePad,
+			Joystick operatorGamePad,
+			WidgetSubsystem widgetSubsystem
+	) {
+		/*
+		 * The trigger buttons on the joysticks move the widget up and down whilst held.
+		 * releasing a button stops the widget movement.
+		 * 
+		 * Also, pressing the A button on the gamepad stops the widget
+		 */
+		new JoystickButton(driverGamePad, 1).whileHeld(new WidgetMoveUpCommand(widgetSubsystem, 0.2));
+		new JoystickButton(driverGamePad, 1).whenReleased(new WidgetStopCommand(widgetSubsystem));
+		new JoystickButton(driverGamePad, 2).whileHeld(new WidgetMoveDownCommand(widgetSubsystem, 0.2));
+		new JoystickButton(driverGamePad, 2).whenReleased(new WidgetStopCommand(widgetSubsystem));
+		
+		new JoystickButton(operatorGamePad, GamepadButtons.A_BUTTON).whenPressed(new WidgetStopCommand(widgetSubsystem));
+		
+		/*
+		 * When the demo trigger conditions are met then we run the WidgetStopCommand()
+		 */
+		new DemoTrigger(operatorGamePad, 3, widgetSubsystem).whenActive(new WidgetStopCommand(widgetSubsystem));
+	}
 }

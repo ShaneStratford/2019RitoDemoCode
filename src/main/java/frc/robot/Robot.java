@@ -7,13 +7,23 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.commands.AutoMoveCommand;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.WidgetSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,7 +33,11 @@ import frc.robot.subsystems.ExampleSubsystem;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static ExampleSubsystem m_subsystem = new ExampleSubsystem();
+  private Joystick driverInput, operatorInput;
+  private DifferentialDrive drive;
+  private SpeedController leftController, rightController;
+  private DriveSubsystem driveSubsystem;
+  private WidgetSubsystem widgetSubsystem;
   public static OI m_oi;
 
   Command m_autonomousCommand;
@@ -35,10 +49,53 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_oi = new OI();
-    m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
+    driverInput = new Joystick(RobotMap.DRIVER_GAMEPAD);
+    operatorInput = new Joystick(RobotMap.OPERATOR_GAMEPAD);
+
+    /*
+     * These two lines are for one or move PWM style drive controllers.
+     * Uncomment the lines and add (or remove) Spark definitions as necessary
+     */
+    //leftController = new SpeedControllerGroup(new Spark(RobotMap.DRIVE_LEFT1_PWM_ID), new Spark(RobotMap.DRIVE_LEFT2_PWM_ID));
+    //rightController = new SpeedControllerGroup(new Spark(RobotMap.DRIVE_RIGHT1_PWM_ID), new Spark(RobotMap.DRIVE_RIGHT2_PWM_ID));
+
+    /*
+     * These two lines are for CTRE Talon SRX CAN Bus style drive controllers.
+     * Uncomment the lines and add (or remove) WPI_TalonSRX definitions as necessary
+     */
+    leftController = new SpeedControllerGroup(new WPI_TalonSRX(RobotMap.DRIVE_LEFT1_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_LEFT2_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_LEFT3_CAN_ID));
+    rightController = new SpeedControllerGroup(new WPI_TalonSRX(RobotMap.DRIVE_RIGHT1_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_RIGHT2_CAN_ID), new WPI_TalonSRX(RobotMap.DRIVE_RIGHT3_CAN_ID));
+
+    drive = new DifferentialDrive(leftController, rightController);
+    /*
+     * These drive subsystem definitions are defining how the driver's controlls affect the motor.
+     * You need ONE of these uncommented, so depending on which style you want chose the appropriate line.
+     */
+    //driveSubsystem = new DriveSubsystem(driverInput::getY, driverInput::getTwist, drive, RobotMap.DriveStyle.DRIVE_STYLE_ARCADE);   // single flight stick with twist for turning
+    driveSubsystem = new DriveSubsystem(() -> driverInput.getRawAxis(1), () -> driverInput.getRawAxis(5), drive, RobotMap.DriveStyle.DRIVE_STYLE_TANK); // single gamepad using thumb sticks as tank control
+
+    /*
+      *  create a widget subsystem. This is code that controls some widget. In the example code it is just a simple motor.
+      *  We create a speed controller for the motor, and this needs to be to the subsystem to be manipulate.
+      *  
+      *  Here we use the Victor SP, a PWM controller that will be available. Yes, we can mix and match our motor controllers,
+      *  although it is better to use the same controller when working in groups (such as left and right on the drive train).
+      */
+    widgetSubsystem = new WidgetSubsystem(new VictorSP(RobotMap.WIDGET_CONTROLLER_ID));
+
+
+    m_oi = new OI(driverInput, operatorInput, widgetSubsystem);
+    m_chooser.setDefaultOption("Default Auto", new AutoMoveCommand(driveSubsystem, 0.5, 0, 0.5));
     // chooser.addOption("My Auto", new MyAutoCommand());
     SmartDashboard.putData("Auto mode", m_chooser);
+
+    /*
+     * Start a camera server - this allows you to have a camera mounted on your robot and the image being shown on the drivers startion.
+     * https://wpilib.screenstepslive.com/s/currentCS/m/vision/l/669166-using-the-cameraserver-on-the-roborio for details.
+     * 
+     * if you don't want a camera server comment out this line.
+     */
+    CameraServer.getInstance().startAutomaticCapture();
   }
 
   /**
@@ -81,6 +138,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_chooser.getSelected();
+    driveSubsystem.setEnabled(true);
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -112,6 +170,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    driveSubsystem.setEnabled(true);
   }
 
   /**
