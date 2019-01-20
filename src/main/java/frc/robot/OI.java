@@ -9,8 +9,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import frc.robot.LIbrary.DemoTrigger;
-import frc.robot.LIbrary.GamepadButtons;
+import frc.robot.library.DemoTrigger;
+import frc.robot.library.GamepadButtons;
 import frc.robot.commands.WidgetMoveDownCommand;
 import frc.robot.commands.WidgetMoveUpCommand;
 import frc.robot.commands.WidgetStopCommand;
