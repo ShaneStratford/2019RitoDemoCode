@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.LIbrary;
+package frc.robot.library;
 
 /**
  * Add your docs here.
