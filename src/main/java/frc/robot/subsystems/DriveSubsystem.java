@@ -16,6 +16,7 @@ public class DriveSubsystem extends Subsystem {
   private DoubleSupplier left, right;
   private RobotMap.DriveStyle driveType = RobotMap.DriveStyle.DRIVE_STYLE_ARCADE;
   private boolean enabled;
+  private boolean halfSpeed = false;
 
   public DriveSubsystem(DoubleSupplier left, DoubleSupplier right, DifferentialDrive drive, DriveStyle driveType) {
     this.left = left;
@@ -43,7 +44,7 @@ public void autoDrive(double forwardPower, double turnPower) {
     case DRIVE_STYLE_ARCADE:
     default:
       //drive.arcadeDrive(-leftJoystick.getY(), rightJoystick.getX(), true);
-      drive.arcadeDrive(left.getAsDouble(), right.getAsDouble(), true);
+      drive.arcadeDrive(left.getAsDouble()*(halfSpeed?0.5:1), right.getAsDouble(), true);
       break;
     case DRIVE_STYLE_TANK:
       drive.tankDrive(-1 * left.getAsDouble(), -1 * right.getAsDouble(), true);
@@ -56,6 +57,11 @@ public void autoDrive(double forwardPower, double turnPower) {
 
   public DriveSubsystem setEnabled(boolean enabled) {
     this.enabled = enabled;
+    return this;
+  }
+
+  public DriveSubsystem setHalfSpeed(boolean halfSpeed) {
+    this.halfSpeed = halfSpeed;
     return this;
   }
 

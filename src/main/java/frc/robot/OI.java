@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.library.DemoTrigger;
 import frc.robot.library.GamepadButtons;
+import frc.robot.commands.DriveSpeedCommand;
 import frc.robot.commands.WidgetMoveDownCommand;
 import frc.robot.commands.WidgetMoveUpCommand;
 import frc.robot.commands.WidgetStopCommand;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.WidgetSubsystem;
 
 /**
@@ -49,9 +51,10 @@ public class OI {
   // until it is finished as determined by it's isFinished method.
   // button.whenReleased(new ExampleCommand());
   public OI(
-			Joystick driverGamePad,
+			Joystick driverLeft,
 			Joystick operatorGamePad,
-			WidgetSubsystem widgetSubsystem
+      WidgetSubsystem widgetSubsystem,
+      DriveSubsystem driveSubsystem
 	) {
 		/*
 		 * The trigger buttons on the joysticks move the widget up and down whilst held.
@@ -59,16 +62,16 @@ public class OI {
 		 * 
 		 * Also, pressing the A button on the gamepad stops the widget
 		 */
-		new JoystickButton(driverGamePad, 1).whileHeld(new WidgetMoveUpCommand(widgetSubsystem, 0.2));
-		new JoystickButton(driverGamePad, 1).whenReleased(new WidgetStopCommand(widgetSubsystem));
-		new JoystickButton(driverGamePad, 2).whileHeld(new WidgetMoveDownCommand(widgetSubsystem, 0.2));
-		new JoystickButton(driverGamePad, 2).whenReleased(new WidgetStopCommand(widgetSubsystem));
+		new JoystickButton(driverLeft, 1).whenPressed(new DriveSpeedCommand(driveSubsystem, true));
+		new JoystickButton(driverLeft, 1).whenReleased(new DriveSpeedCommand(driveSubsystem, false));
+		//new JoystickButton(driverLeft, 2).whileHeld(new WidgetMoveDownCommand(widgetSubsystem, 0.2));
+		//new JoystickButton(driverLeft, 2).whenReleased(new WidgetStopCommand(widgetSubsystem));
 		
-		new JoystickButton(operatorGamePad, GamepadButtons.A_BUTTON).whenPressed(new WidgetStopCommand(widgetSubsystem));
+		//new JoystickButton(operatorGamePad, GamepadButtons.A_BUTTON).whenPressed(new WidgetStopCommand(widgetSubsystem));
 		
 		/*
 		 * When the demo trigger conditions are met then we run the WidgetStopCommand()
 		 */
-		new DemoTrigger(operatorGamePad, 3, widgetSubsystem).whenActive(new WidgetStopCommand(widgetSubsystem));
+		//new DemoTrigger(operatorGamePad, 3, widgetSubsystem).whenActive(new WidgetStopCommand(widgetSubsystem));
 	}
 }

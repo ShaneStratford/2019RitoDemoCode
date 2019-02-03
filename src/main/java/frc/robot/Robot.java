@@ -37,7 +37,7 @@ import frc.robot.subsystems.WidgetSubsystem;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Joystick driverInput, operatorInput;
+  private Joystick driverLeft, driverRight, operatorInput;
   private DifferentialDrive drive;
   private SpeedController leftController, rightController;
   private DriveSubsystem driveSubsystem;
@@ -53,7 +53,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    driverInput = new Joystick(RobotMap.DRIVER_GAMEPAD);
+    driverLeft = new Joystick(RobotMap.DRIVER_LEFT);
+    driverRight = new Joystick(RobotMap.DRIVER_RIGHT);
     operatorInput = new Joystick(RobotMap.OPERATOR_GAMEPAD);
 
     /*
@@ -76,7 +77,7 @@ public class Robot extends TimedRobot {
      * These drive subsystem definitions are defining how the driver's controlls affect the motor.
      * You need ONE of these uncommented, so depending on which style you want chose the appropriate line.
      */
-    driveSubsystem = new DriveSubsystem(driverInput::getY, driverInput::getTwist, drive, RobotMap.DriveStyle.DRIVE_STYLE_ARCADE);   // single flight stick with twist for turning
+    driveSubsystem = new DriveSubsystem(driverLeft::getY, driverRight::getX, drive, RobotMap.DriveStyle.DRIVE_STYLE_ARCADE);   // single flight stick with twist for turning
     //driveSubsystem = new DriveSubsystem(() -> driverInput.getRawAxis(1), () -> driverInput.getRawAxis(5), drive, RobotMap.DriveStyle.DRIVE_STYLE_TANK); // single gamepad using thumb sticks as tank control
 
     /*
@@ -89,7 +90,7 @@ public class Robot extends TimedRobot {
     widgetSubsystem = new WidgetSubsystem(new VictorSP(RobotMap.WIDGET_CONTROLLER_ID));
 
 
-    m_oi = new OI(driverInput, operatorInput, widgetSubsystem);
+    m_oi = new OI(driverLeft, operatorInput, widgetSubsystem, driveSubsystem);
     m_chooser.setDefaultOption("Default Auto", new AutoMoveCommand(driveSubsystem, 0.5, 0, 0.5));
     // chooser.addOption("My Auto", new MyAutoCommand());
     SmartDashboard.putData("Auto mode", m_chooser);
